@@ -1,0 +1,223 @@
+import React, { useState } from "react";
+import styled from "styled-components";
+import { Link } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
+
+
+
+const Form = styled.form`
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+`;
+
+const InputGroup = styled.div`
+  margin-bottom: 20px;
+`;
+
+const Label = styled.label`
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #555;
+`;
+
+const Input = styled.input`
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+
+  &:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+`;
+
+const Textarea = styled.textarea`
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+  resize: vertical;
+  height: 100px;
+
+  &:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+`;
+
+const Select = styled.select`
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+
+  &:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+`;
+
+const Button = styled.button`
+  width: 100%;
+  padding: 10px 15px;
+  font-size: 18px;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #0056b3;
+  }
+`; 
+
+const LinkWrapper = styled.div`
+  margin-top: 20px;
+  text-align: center;
+`;
+
+const StyledLink = styled(Link)`
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+function Add() {
+    const [newImage, setImage] = useState('');
+    const [newTitle, setTitle] = useState('');
+    const [newIngredients, setIngredients] = useState('');
+    const [newInstructions, setInstructions] = useState('');
+    const [newCategory, setCategory] = useState('');
+    
+  const navigate = useNavigate();
+
+
+    function capitalizeFirstLetter(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+    }
+    
+
+    const dataPost = async (e) => {
+        e.preventDefault();
+        const url = "http://localhost:3000/recipes";
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    image: newImage,
+                    title: capitalizeFirstLetter(newTitle),
+                    ingredients: newIngredients,
+                    instructions: newInstructions,
+                    category: newCategory
+                }),
+            });
+            if (response.ok) {
+                setImage('');
+                setTitle('');
+                setIngredients('');
+                setInstructions('');
+                setCategory('');
+                navigate('/Recipes');
+            } else {
+                console.error("Registrazione fallita.");
+            }
+        } catch (error) {
+            console.error("Errore durante la richiesta di aggiunta:", error);
+        }
+    };
+
+    return (
+        <Form onSubmit={dataPost}>
+          <h1>Aggiungi Ricetta</h1>
+          <InputGroup>
+            <Label htmlFor="image">Immagine</Label>
+            <Input
+              type="text"
+              id="image"
+              placeholder="URL immagine"
+              value={newImage}
+              onChange={(e) => setImage(e.target.value)}
+              required
+            />
+          </InputGroup>
+    
+          <InputGroup>
+            <Label htmlFor="title">Titolo</Label>
+            <Input
+              type="text"
+              id="title"
+              placeholder="Titolo della ricetta"
+              value={newTitle}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
+          </InputGroup>
+    
+          <InputGroup>
+            <Label htmlFor="ingredients">Ingredienti</Label>
+            <Textarea
+              id="ingredients"
+              placeholder="Elenca gli ingredienti"
+              value={newIngredients}
+              onChange={(e) => setIngredients(e.target.value)}
+              required
+            />
+          </InputGroup>
+    
+          <InputGroup>
+            <Label htmlFor="instructions">Istruzioni</Label>
+            <Textarea
+              id="instructions"
+              placeholder="Descrivi i passaggi della ricetta"
+              value={newInstructions}
+              onChange={(e) => setInstructions(e.target.value)}
+              required
+            />
+          </InputGroup>
+    
+          <InputGroup>
+            <Label htmlFor="category">Categoria</Label>
+            <Select
+              id="category"
+              value={newCategory}
+              onChange={(e) => setCategory(e.target.value)}
+              required
+            >
+              <option value="">Seleziona una categoria</option>
+              <option value="Primo">Primo</option>
+              <option value="Secondo">Secondo</option>
+              <option value="Dessert">Dessert</option>
+            </Select>
+          </InputGroup>
+    
+          <Button type="submit">Aggiungi Ricetta</Button>
+
+          <LinkWrapper>
+            <StyledLink to="/">Vai alle Ricette</StyledLink>
+          </LinkWrapper>
+        </Form>
+    );
+}
+
+export default Add;
